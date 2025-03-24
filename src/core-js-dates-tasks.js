@@ -129,8 +129,13 @@ function getCountDaysOnPeriod(dateStart, dateEnd) {
  * '2024-02-02', { start: '2024-02-02', end: '2024-03-02' } => true
  * '2024-02-10', { start: '2024-02-02', end: '2024-03-02' } => true
  */
-function isDateInPeriod(/* date, period */) {
-  throw new Error('Not implemented');
+function isDateInPeriod(date, period) {
+  const dateTimestamp = new Date(date);
+  const startDateTimestamp = new Date(period.start);
+  const endDateTimestamp = new Date(period.end);
+  return (
+    dateTimestamp >= startDateTimestamp && dateTimestamp <= endDateTimestamp
+  );
 }
 
 /**
@@ -144,24 +149,21 @@ function isDateInPeriod(/* date, period */) {
  * '1999-01-05T02:20:00.000Z' => '1/5/1999, 2:20:00 AM'
  * '2010-12-15T22:59:00.000Z' => '12/15/2010, 10:59:00 PM'
  */
-function formatDate(/* date */) {
-  throw new Error('Not implemented');
+function formatDate(date) {
+  return new Date(date).toLocaleString('en-US', { timeZone: 'UTC' });
 }
 
-/**
- * Returns the total number of weekend days (Saturdays and Sundays) in a specified month and year.
- *
- * @param {number} month - The source month as a number (1 for January, 2 for February, etc.).
- * @param {number} year - The source year as a four-digit number.
- * @return {number} - The total count of weekend days in the month.
- *
- * @example:
- * 5, 2022 => 9
- * 12, 2023 => 10
- * 1, 2024 => 8
- */
-function getCountWeekendsInMonth(/* month, year */) {
-  throw new Error('Not implemented');
+function getCountWeekendsInMonth(month, year) {
+  const date = new Date(year, month, 0);
+  const countDays = date.getDate();
+  let countWeekends = 0;
+  for (let i = 1; i <= countDays; i += 1) {
+    const dayIndex = new Date(year, month - 1, i).getDay();
+    if (dayIndex === 0 || dayIndex === 6) {
+      countWeekends += 1;
+    }
+  }
+  return countWeekends;
 }
 
 /**
@@ -177,8 +179,15 @@ function getCountWeekendsInMonth(/* month, year */) {
  * Date(2024, 0, 31) => 5
  * Date(2024, 1, 23) => 8
  */
-function getWeekNumberByDate(/* date */) {
-  throw new Error('Not implemented');
+function getWeekNumberByDate(date) {
+  const millisecondsInDay = 24 * 60 * 60 * 1000;
+  const millisecondsInWeek = 7 * millisecondsInDay;
+  const firstDateOfYear = new Date(date.getFullYear(), 0, 1);
+  date.setDate(date.getDate() + 1);
+  const countWeeks = Math.ceil(
+    (date.getTime() - firstDateOfYear.getTime()) / millisecondsInWeek
+  );
+  return countWeeks;
 }
 
 /**
@@ -192,8 +201,12 @@ function getWeekNumberByDate(/* date */) {
  * Date(2024, 0, 13) => Date(2024, 8, 13)
  * Date(2023, 1, 1) => Date(2023, 9, 13)
  */
-function getNextFridayThe13th(/* date */) {
-  throw new Error('Not implemented');
+function getNextFridayThe13th(date) {
+  let d = new Date(date);
+  while (d.getDate() !== 13) {
+    d = getNextFriday(d);
+  }
+  return d;
 }
 
 /**
